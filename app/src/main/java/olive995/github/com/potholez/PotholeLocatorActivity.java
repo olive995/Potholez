@@ -1,10 +1,8 @@
 package olive995.github.com.potholez;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,7 +22,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -36,13 +33,10 @@ public class PotholeLocatorActivity extends FragmentActivity implements OnMapRea
         LocationListener {
 
     private GoogleMap mMap;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
     private Button button;
-    private LatLng currentLatLng;
     protected GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
     private Location mLastLocation;
+    private LocationRequest mLocationRequest;
     private Marker mCurrLocationMarker;
 
 
@@ -50,6 +44,7 @@ public class PotholeLocatorActivity extends FragmentActivity implements OnMapRea
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pothole_locator);
+
         button = (Button) findViewById(R.id.reportButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +53,11 @@ public class PotholeLocatorActivity extends FragmentActivity implements OnMapRea
 
             }
         });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkLocationPermissions();
+        }
+
 
     }
 
@@ -110,7 +110,9 @@ public class PotholeLocatorActivity extends FragmentActivity implements OnMapRea
                         if (mGoogleApiClient == null) {
                             buildGoogleApiClient();
                         }
-                        mMap.setMyLocationEnabled(true);
+                        if (mMap != null) {
+                            mMap.setMyLocationEnabled(true);
+                        }
                     }
 
                 } else {
@@ -154,28 +156,24 @@ public class PotholeLocatorActivity extends FragmentActivity implements OnMapRea
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
-            //Initialize Google Play Services
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-               if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        //Initialize Google Play Services
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
                     buildGoogleApiClient();
                     mMap.setMyLocationEnabled(true);
-                }
             }
-            else {
+        } else {
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
-            }
-
+        }
 
         // Add a marker in Sydney and move the camera
-        currentLatLng = new LatLng(45.213, -122.6765);
         mMap.setMinZoomPreference(16);
         mMap.setMaxZoomPreference(19);
-        mMap.addMarker(new MarkerOptions().position(currentLatLng).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
     }
+
     protected synchronized void buildGoogleApiClient(){
             mGoogleApiClient = new GoogleApiClient.Builder(this)
             .addConnectionCallbacks(this)
@@ -183,6 +181,6 @@ public class PotholeLocatorActivity extends FragmentActivity implements OnMapRea
             .addApi(LocationServices.API)
             .build();
             mGoogleApiClient.connect();
-            }
+    }
 
 }
