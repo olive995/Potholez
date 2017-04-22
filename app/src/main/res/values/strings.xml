@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">PDX Potholes</string>
     <string name="title_activity_pothole_locator">PDX Potholes</string>
+    <string name="report_pothole">Report Pothole</string>
+    <string name="desc">App description</string>
 </resources>
