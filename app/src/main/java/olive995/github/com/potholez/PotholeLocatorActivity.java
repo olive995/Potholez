@@ -33,19 +33,19 @@ public class PotholeLocatorActivity extends FragmentActivity implements OnMapRea
         LocationListener {
 
     private GoogleMap mMap;
-    private Button button;
     protected GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
-    private LocationRequest mLocationRequest;
+    private LocationRequest mLocationRequest = new LocationRequest();
     private Marker mCurrLocationMarker;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pothole_locator);
+        Button button = (Button) findViewById(R.id.reportButton);
 
-        button = (Button) findViewById(R.id.reportButton);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,7 +64,7 @@ public class PotholeLocatorActivity extends FragmentActivity implements OnMapRea
 
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation = location;
+        //location = mLastLocation;
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
@@ -124,7 +124,6 @@ public class PotholeLocatorActivity extends FragmentActivity implements OnMapRea
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
